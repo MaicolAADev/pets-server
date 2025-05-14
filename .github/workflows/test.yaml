@@ -1,3 +1,7 @@
+permissions:
+  actions: read  
+  contents: read 
+
 name: Run Tests 
 
 on:
