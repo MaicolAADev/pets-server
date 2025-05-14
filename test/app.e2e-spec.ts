@@ -57,7 +57,6 @@ describe('AdoptionCenters (e2e)', () => {
         youtube: 'maicolaa',
         whatsapp: '232323'
       });
-    console.log(createResponse.body)
 
     createdId = createResponse.body?.body?.id;
     if (!createdId) {
@@ -99,7 +98,6 @@ describe('AdoptionCenters (e2e)', () => {
     expect(res.body.body).toHaveProperty('id');
     expect(res.body.body).toHaveProperty('name', 'Perro');
 
-    console.log(res.body)
     createdPetTypeId = res.body.body.id;
   });
 
@@ -115,6 +113,55 @@ describe('AdoptionCenters (e2e)', () => {
     expect(res.body.body).toHaveProperty('id', createdPetTypeId);
     expect(res.body.body).toHaveProperty('name', 'Perro');
   });
+
+  let createdPetId: number;
+
+  it('/POST /pets debe crear una mascota', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/pets')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Max',
+        description: 'Pastor Alemán juguetón',
+        adoptionCenterId: createdId,
+        petType: {
+          id: createdPetTypeId,
+        },
+        attributeValues: [],
+      })
+      .expect(200);
+
+    expect(res.body).toHaveProperty('status', 200);
+    expect(res.body).toHaveProperty('body');
+    createdPetId = res.body.body.id;
+  });
+
+  it('/GET /pets/:id debe retornar el detalle de la mascota', async () => {
+    const res = await request(app.getHttpServer())
+      .get(`/pets/${createdPetId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(res.body).toHaveProperty('status', 200);
+    expect(res.body).toHaveProperty('message', 'Success');
+    expect(res.body).toHaveProperty('body');
+
+    const pet = res.body.body;
+    expect(pet).toHaveProperty('id', createdPetId);
+    expect(pet).toHaveProperty('name', 'Max');
+    expect(pet).toHaveProperty('description', 'Pastor Alemán juguetón');
+    expect(pet).toHaveProperty('active', true);
+
+    expect(pet.adoptionCenter).toHaveProperty('id', createdId);
+    expect(pet.adoptionCenter).toHaveProperty('name', 'Adoption Center 1');
+
+    expect(pet.petType).toHaveProperty('id', createdPetTypeId);
+    expect(pet.petType).toHaveProperty('name', 'Perro');
+
+    expect(pet.attributeValues).toEqual([]);
+    expect(pet.files).toEqual([]);
+  });
+
 });
 
 
