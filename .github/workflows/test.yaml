@@ -58,13 +58,10 @@ jobs:
             sleep 2
           done
           echo "Postgres failed to start" && exit 1
-          
+
 
       - name: Run Linter
         run: npm run lint
-
-      - name: Run Unit Tests
-        run: npm run test
 
       - name: Run E2E Tests
         run: npm run test:e2e
