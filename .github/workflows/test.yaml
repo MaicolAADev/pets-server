@@ -1,0 +1,69 @@
+name: Run Tests 
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: mantum
+          POSTGRES_PASSWORD: gatostem123
+          POSTGRES_DB: pets
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mantum"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate .env file
+        run: |
+          echo "URL_CLIENT=http://localhost:3000" > .env
+          echo "SERVER_PORT=4001" >> .env
+          echo "NODE_ENV=localhost" >> .env
+          echo "DB_HOST=localhost" >> .env
+          echo "DB_PORT=5432" >> .env
+          echo "DB_USERNAME=mantum" >> .env
+          echo "DB_PASSWORD=gatostem123" >> .env
+          echo "DB_NAME=pets" >> .env
+
+      - name: Wait for PostgreSQL
+        run: |
+          for i in {1..30}; do
+            nc -z localhost 5432 && echo "Postgres is ready" && exit 0
+            echo "Waiting for Postgres..."
+            sleep 2
+          done
+          echo "Postgres failed to start" && exit 1
+
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Run Unit Tests
+        run: npm run test
+
+      - name: Run E2E Tests
+        run: npm run test:e2e
