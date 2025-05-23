@@ -56,6 +56,16 @@ export class PetsService extends BaseService<Pets, PetsDto> {
               matches: (await file.getIdEntity()) === pet.id,
             })),
           );
+
+          const adoptionCenter = await this.adoptionCenterService.findOne(
+            pet.adoptionCenterId,
+          );
+
+          pet = {
+            ...pet,
+            adoptionCenter,
+          };
+
           const filteredFiles = petFiles
             .filter((f) => f.matches)
             .map((f) => f.file);
