@@ -57,15 +57,12 @@ export class PetsService extends BaseService<Pets, PetsDto> {
             })),
           );
 
-          const adoptionCenter = await this.adoptionCenterService.findOne(
-            pet.adoptionCenterId,
-          );
+          const pet2 = await this.petsRepository.findOne({
+            where: { id: pet.id },
+            relations: ['adoptionCenter'],
+          });
 
-          pet = {
-            ...pet,
-            adoptionCenter,
-          };
-
+          pet = pet2;
           const filteredFiles = petFiles
             .filter((f) => f.matches)
             .map((f) => f.file);
