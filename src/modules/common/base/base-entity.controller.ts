@@ -54,6 +54,7 @@ export abstract class BaseEntityController extends BaseController {
       const created = await this.service.create(dto);
       return this.successResponse(res, this.createdMessage, created);
     } catch (error) {
+      console.log(error);
       return this.handleError(res, error);
     }
   }

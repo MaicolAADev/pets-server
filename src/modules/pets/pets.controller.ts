@@ -16,6 +16,7 @@ import { Auth } from '@modules/auth/decorators/auth.decorator';
 import { BaseEntityController } from '@modules/common/base/base-entity.controller';
 import { PetsService } from './pets.service';
 import { PaginationQueryDto } from '@modules/common/dto/pagination/pagination-query.dto';
+import { Public } from '@modules/auth/decorators/public.decorator';
 
 @Controller('pets')
 export class PetsController extends BaseEntityController {
@@ -32,10 +33,12 @@ export class PetsController extends BaseEntityController {
   }
 
   @Get()
+  @Public()
   async findAll(@Query() query: PaginationQueryDto, @Res() res: Response) {
     return super.findAll(query, res);
   }
 
+  @Public()
   @Get(':id')
   async findOne(@Param('id') id: string, @Res() res: Response) {
     return super.findOne(id, res);

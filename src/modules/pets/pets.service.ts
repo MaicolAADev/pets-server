@@ -152,6 +152,7 @@ export class PetsService extends BaseService<Pets, PetsDto> {
     }
 
     for (const attrValue of attributeValuesInput) {
+      console.log("attrValue", attrValue);
       const attribute = requiredAttributes.find(
         (a) => a.id === attrValue.attribute.id,
       );
@@ -161,14 +162,14 @@ export class PetsService extends BaseService<Pets, PetsDto> {
         );
       }
 
-      if (
-        attribute.allowedValues?.length > 0 &&
-        !attribute.allowedValues.includes(attrValue.value)
-      ) {
-        throw new NotFoundException(
-          `Invalid value for attribute ${attribute.name}. Allowed values: ${attribute.allowedValues.join(', ')}`,
-        );
-      }
+      // if (
+      //   attribute.allowedValues?.length > 0 &&
+      //   !attribute.allowedValues.includes(attrValue.value)
+      // ) {
+      //   throw new NotFoundException(
+      //     `Invalid value for attribute ${attribute.name}. Allowed values: ${attribute.allowedValues.join(', ')}`,
+      //   );
+      // }
     }
 
     const pet = await this.petsRepository.save(
